@@ -81,10 +81,12 @@ function! s:MineSweeper.run(width,height,num_of_mine)
 	hi MineSweeper7      ctermfg=red         ctermbg=gray guifg=red         guibg=gray  
 	hi MineSweeper8      ctermfg=red         ctermbg=gray guifg=red         guibg=gray  
 
-	nnoremap <silent> <buffer> x  :call <SID>_click()<CR>
-	nnoremap <silent> <buffer> v  :call <SID>_right_click()<CR>
-	nnoremap <silent> <buffer> zz :call <SID>_wheel_click()<CR>
-
+	nnoremap <silent> <buffer> x  			:call <SID>_click()<CR>
+	nnoremap <silent> <buffer> <LeftMouse>  :call <SID>_click()<CR>
+	nnoremap <silent> <buffer> v  			:call <SID>_right_click()<CR>
+	nnoremap <silent> <buffer> <RightMouse> :call <SID>_right_click()<CR>
+	nnoremap <silent> <buffer> zz 			:call <SID>_wheel_click()<CR>
+	
 	setl conceallevel=2
 	setl nonumber
 	setl noswapfile
