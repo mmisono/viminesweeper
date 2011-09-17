@@ -23,6 +23,8 @@ let s:MineSweeper = {
 			\ 'num_of_flag' : 0,
 			\ 'status'      : 0,
 			\ 'mine_is_set' : 0,
+			\ 'start_time'  : 0,
+			\ 'end_time'    : 0,
 			\}
 
 function! s:MineSweeper.run(width,height,num_of_mine)
@@ -87,6 +89,11 @@ function! s:MineSweeper.run(width,height,num_of_mine)
 	nnoremap <silent> <buffer> <RightMouse> :call <SID>_right_click()<CR>
 	nnoremap <silent> <buffer> zz 			:call <SID>_wheel_click()<CR>
 	
+	augroup MineSweeper
+		autocmd!
+		autocmd  CursorMoved \*MineSweeper\* call <SID>_set_caption()
+	augroup END
+	
 	setl conceallevel=2
 	setl nonumber
 	setl noswapfile
@@ -104,6 +111,7 @@ function! s:MineSweeper.click()
 	if !self.mine_is_set
 		let self.mine_is_set = 1
 		call self.set_mine(x,y)
+		let self.start_time = reltime()
 	endif
 
 	if self.board2[y][x] == 'F' ||
@@ -112,6 +120,7 @@ function! s:MineSweeper.click()
 	elseif self.board1[y][x] == '*'
 		let self.board2 = copy(self.board1)
 		let self.status = 1
+		let self.end_time = reltime()
 		" call s:message("Bomb!!!")
 	else
 		try
@@ -120,6 +129,7 @@ function! s:MineSweeper.click()
 		endtry
 		if self.check_board()
 			let self.status = 2
+			let self.end_time = reltime()
 			" call s:message("Clear!")
 		endif
 	endif
@@ -180,6 +190,7 @@ function! s:MineSweeper.wheel_click()
 			 		if self.board1[y+i][x+j] == '*'
 						let self.board2 = copy(self.board1)
 						let self.status = 1
+						let self.end_time = reltime()
 						break
 					endif
 					call self.expand(x+j,y+i)
@@ -192,6 +203,7 @@ function! s:MineSweeper.wheel_click()
 
 	if self.check_board()
 		let self.status = 2
+		let self.end_time = reltime()
 	endif
 	
 	call self.draw()
@@ -233,6 +245,8 @@ function! s:MineSweeper.expand(x,y)
 endfunction
 
 function! s:MineSweeper.initialize_board()
+	let self.start_time =  0
+	let self.end_time   =  0
 	let self.mine_is_set = 0
 	let self.num_of_flag = 0
 	let self.status = 0
@@ -282,15 +296,37 @@ function! s:MineSweeper.set_mine(cur_x,cur_y)
 	endfor
 endfunction
 
+function! s:MineSweeper.set_caption()
+	setl modifiable
+
+	let status = ['',"Bomb!!!","Clear!"]
+	if type(self.start_time) == type([])
+		if type(self.end_time) == type([])
+			let _time = reltimestr(reltime(self.start_time,self.end_time))
+		else
+			let _time = reltimestr(reltime(self.start_time))
+		endif
+		let match_end = matchend(_time, '\d\+\.') - 2
+		let time = _time[:match_end]
+	else
+		let time = 0 
+	endif
+	let str = printf("| %3s - %2d/%2d %s |", 
+				\ time,self.num_of_flag,
+				\ self.num_of_mine,status[self.status])
+	call setline(1,str)
+	
+	setl nomodified
+	setl nomodifiable
+endfunction
+
 function! s:MineSweeper.draw()
 	setl modifiable
 	silent %d _
 
-	let status = ['',"Bomb!!!","Clear!"]
-	let str = printf("| %2d/%2d %s |", 
-				\self.num_of_flag, self.num_of_mine,status[self.status])
-	call setline(1,str)
+	call self.set_caption()
 
+	setl modifiable
 	for i in range(self.height)
 		let str = join(self.board2[i],'')
 		call append(line('$'),str)
@@ -350,6 +386,10 @@ endfunction
 
 function! s:_wheel_click()
 	call call(s:MineSweeper.wheel_click,[],s:MineSweeper)
+endfunction
+
+function! s:_set_caption()
+	call call(s:MineSweeper.set_caption,[],s:MineSweeper)
 endfunction
 
 function! s:level(ArgLead,CmdLine,CursorPos)
