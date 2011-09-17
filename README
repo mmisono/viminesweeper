@@ -1,0 +1,8 @@
+
+usage: MineSweeper [easy,normal,hard]
+       MineSweeper  custom {width} {height} {num_of_mine}
+
+hjkl: move
+x   : left click
+v   : right click
+zz  : wheel click
