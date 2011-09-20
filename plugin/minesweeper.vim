@@ -34,13 +34,13 @@ function! s:MineSweeper.run(width,height,num_of_mine)
 		return
 	endif
 
-	let winnum = bufwinnr(bufnr('\*MineSweeper\*'))
+	let winnum = bufwinnr(bufnr('==MineSweeper=='))
 	if winnum != -1
 		if winnum != bufwinnr('%')
 			exe "normal \<c-w>".winnum."w"
 		endif
 	else
-		exec 'silent split \*MineSweeper\*'
+		exec 'silent split ==MineSweeper=='
 	endif
 
 	let self.width = a:width
