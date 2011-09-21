@@ -43,6 +43,8 @@ function! s:MineSweeper.run(width,height,num_of_mine)
 		exec 'silent split ==MineSweeper=='
 	endif
 
+	call s:srand(localtime())
+
 	let self.width = a:width
 	let self.height = a:height
 	let self.num_of_mine = a:num_of_mine
@@ -336,16 +338,14 @@ function! s:MineSweeper.draw()
 	setl nomodifiable
 endfunction
 
-let s:rand_num = 1
+let s:seed = 0
+function! s:srand(seed)
+	let s:seed = a:seed
+endfunction
+
 function! s:rand()
-	if has('reltime')
-		let match_end = matchend(reltimestr(reltime()), '\d\+\.') + 1
-		return reltimestr(reltime())[l:match_end : ]
-	else
-		" awful
-		let s:rand_num += 1
-		return s:rand_num
-	endif
+	let s:seed = s:seed * 214013 + 2531011
+	return (s:seed < 0 ? s:seed - 0x80000000 : s:seed) / 0x10000 % 0x8000
 endfunction
 
 function! s:message(msg)
