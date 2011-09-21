@@ -91,7 +91,7 @@ function! s:MineSweeper.run(width,height,num_of_mine)
 	
 	augroup MineSweeper
 		autocmd!
-		autocmd  CursorMoved \*MineSweeper\* call <SID>_set_caption()
+		autocmd  CursorMoved <buffer> call <SID>_set_caption()
 	augroup END
 	
 	setl conceallevel=2
