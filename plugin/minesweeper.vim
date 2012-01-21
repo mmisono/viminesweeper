@@ -34,13 +34,17 @@ function! s:MineSweeper.run(width,height,num_of_mine)
 		return
 	endif
 
-	let winnum = bufwinnr(bufnr('==MineSweeper=='))
+	if !exists("g:minesweeper_title")
+		let g:minesweeper_title = "==MineSweeper=="
+	endif
+
+	let winnum = bufwinnr(bufnr(g:minesweeper_title))
 	if winnum != -1
 		if winnum != bufwinnr('%')
 			exe "normal \<c-w>".winnum."w"
 		endif
 	else
-		exec 'silent split ==MineSweeper=='
+		exec 'silent split ' . g:minesweeper_title
 	endif
 
 	call s:srand(localtime())
@@ -70,20 +74,25 @@ function! s:MineSweeper.run(width,height,num_of_mine)
 	syn match MineSweeper6      '6'
 	syn match MineSweeper7      '7'
 	syn match MineSweeper8      '8'
-	hi MineSweeperStatus ctermfg=darkyellow  guifg=darkyellow
-	hi MineSweeperBomb   ctermfg=brown       ctermbg=gray guifg=brown       guibg=gray
-	hi MineSweeperField  ctermfg=gray        ctermbg=gray guifg=gray        guibg=gray  
-	hi MineSweeperFlag   ctermfg=darkmagenta ctermbg=gray guifg=darkmagenta guibg=gray
-	hi MineSweeperHatena ctermfg=darkblue    ctermbg=gray guifg=darkblue    guibg=gray
-	hi MineSweeper0      ctermfg=darkgray    ctermbg=gray guifg=darkgray    guibg=gray  
-	hi MineSweeper1      ctermfg=blue        ctermbg=gray guifg=blue        guibg=gray  
-	hi MineSweeper2      ctermfg=green       ctermbg=gray guifg=green       guibg=gray  
-	hi MineSweeper3      ctermfg=red         ctermbg=gray guifg=red         guibg=gray  
-	hi MineSweeper4      ctermfg=darkred     ctermbg=gray guifg=darkred     guibg=gray  
-	hi MineSweeper5      ctermfg=red         ctermbg=gray guifg=red         guibg=gray  
-	hi MineSweeper6      ctermfg=red         ctermbg=gray guifg=red         guibg=gray  
-	hi MineSweeper7      ctermfg=red         ctermbg=gray guifg=red         guibg=gray  
-	hi MineSweeper8      ctermfg=red         ctermbg=gray guifg=red         guibg=gray  
+	if !exists("g:minesweeper_custom_colors")
+		let g:minesweeper_custom_colors = 0
+	endif
+	if g:minesweeper_custom_colors == 0
+		hi MineSweeperStatus ctermfg=darkyellow  guifg=darkyellow
+		hi MineSweeperBomb   ctermfg=brown       ctermbg=gray guifg=brown       guibg=gray
+		hi MineSweeperField  ctermfg=gray        ctermbg=gray guifg=gray        guibg=gray
+		hi MineSweeperFlag   ctermfg=darkmagenta ctermbg=gray guifg=darkmagenta guibg=gray
+		hi MineSweeperHatena ctermfg=darkblue    ctermbg=gray guifg=darkblue    guibg=gray
+		hi MineSweeper0      ctermfg=darkgray    ctermbg=gray guifg=darkgray    guibg=gray
+		hi MineSweeper1      ctermfg=blue        ctermbg=gray guifg=blue        guibg=gray
+		hi MineSweeper2      ctermfg=green       ctermbg=gray guifg=green       guibg=gray
+		hi MineSweeper3      ctermfg=red         ctermbg=gray guifg=red         guibg=gray
+		hi MineSweeper4      ctermfg=darkred     ctermbg=gray guifg=darkred     guibg=gray
+		hi MineSweeper5      ctermfg=red         ctermbg=gray guifg=red         guibg=gray
+		hi MineSweeper6      ctermfg=red         ctermbg=gray guifg=red         guibg=gray
+		hi MineSweeper7      ctermfg=red         ctermbg=gray guifg=red         guibg=gray
+		hi MineSweeper8      ctermfg=red         ctermbg=gray guifg=red         guibg=gray
+	endif
 
 	nnoremap <silent> <buffer> x  			:call <SID>_click()<CR>
 	nnoremap <silent> <buffer> <LeftMouse>  :call <SID>_click()<CR>
@@ -96,11 +105,17 @@ function! s:MineSweeper.run(width,height,num_of_mine)
 		autocmd  CursorMoved <buffer> call <SID>_set_caption()
 	augroup END
 	
+	if exists("g:minesweeper_statusline")
+		let &l:statusline = g:minesweeper_statusline
+	endif
+
 	setl conceallevel=2
+	setl nocursorline
 	setl nonumber
 	setl noswapfile
 	setl nomodified
 	setl nomodifiable
+	setl buftype=nofile
 	setl bufhidden=delete
 endfunction
 
