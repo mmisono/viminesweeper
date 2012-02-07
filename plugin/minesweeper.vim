@@ -112,6 +112,7 @@ function! s:MineSweeper.run(width,height,num_of_mine)
 	setl conceallevel=2
 	setl nocursorline
 	setl nonumber
+	setl norelativenumber
 	setl noswapfile
 	setl nomodified
 	setl nomodifiable
